@@ -1,13 +1,12 @@
 import numpy as np
 
-def reg_cov(matrix, penalty=0.5):
-    
+def reg_cov(matrix):
+    """ Regularized L2 Covariance Matrix estimator
+    """
     cov = matrix.cov()
 
     # Compute sample covariance matrix
     sampleCov = np.dot(matrix.values.T, matrix.values) / len(matrix.columns)
-    sampleMean = matrix.mean()
-    
     I = np.identity(len(cov.columns))
     
     # Compute the estimates
@@ -21,5 +20,4 @@ def reg_cov(matrix, penalty=0.5):
     
     covEstimate = row1 * mu * I + row2 * sampleCov  
     
-    #(1-penalty)*cov+penalty*np.identity(cov.shape[0])
     return covEstimate

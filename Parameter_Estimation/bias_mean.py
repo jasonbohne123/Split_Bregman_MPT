@@ -1,6 +1,8 @@
 import numpy as np
 
 def reg_mean(matrix, days):
+    """ Regularized James- Stein mean vector estimator
+    """
     
     cov = matrix.cov()
 
