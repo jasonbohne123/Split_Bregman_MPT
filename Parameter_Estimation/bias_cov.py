@@ -1,11 +1,11 @@
 import numpy as np
 
-def reg_cov(cov,penalty=0.5):
+def reg_cov(matrix, penalty=0.5):
     
     cov = matrix.cov()
 
     # Compute sample covariance matrix
-    sampleCov = np.dot(returns.values.T, returns.values) / len(matrix.columns)
+    sampleCov = np.dot(matrix.values.T, matrix.values) / len(matrix.columns)
     sampleMean = matrix.mean()
     
     I = np.identity(len(cov.columns))
