@@ -33,4 +33,4 @@ def reg_mean(matrix, days):
     rho = min(leftside, rightside)[0][0]       
     meanEstimate = (1 - rho)*sampleMean + rho*eta*np.ones(shape = (len(sampleMean),))
     
-    return meanEstimate
+    return meanEstimate.values
