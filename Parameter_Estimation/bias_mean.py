@@ -10,6 +10,19 @@ def reg_mean(matrix, days):
     sampleCov = np.dot(matrix.values.T, matrix.values) / len(matrix.columns)
     sampleMean = matrix.mean()
     
+    I = np.identity(len(cov.columns))
+    
+    # Compute the estimates
+    mu = np.dot(cov, I)
+    alpha = np.linalg.norm(cov - mu * I)
+    beta = np.linalg.norm(sampleCov - cov)
+    delta = np.linalg.norm(sampleCov - mu * I)
+
+    row1 = (beta**2)/(alpha**2 + beta**2)
+    row2 = (alpha**2)/(delta**2)
+    
+    covEstimate = row1 * mu * I + row2 * sampleCov  
+    
     # Find the mean estimate
     eta = max(sampleMean.sum() / sampleMean.size, 0.0004)   
     denom = np.dot(np.transpose((sampleMean - eta*np.ones(shape = (len(sampleMean),))).values.reshape((len(sampleMean), 1))),
