@@ -38,8 +38,8 @@ def qp(cov,mean,w,d,b,lb,ub,lambda2,approach,tol=10e-6,maxiter=25,verbose=True):
         status=res.status
         
     if approach=="closed-form":
-        w_old=w
         
+        w_old=w
         # define objective function
         quad=csc_matrix((cov+lambda2*np.diag(d-b)),shape=(len(mean),len(mean)))
         linear=-1*mean
@@ -79,7 +79,7 @@ def shrinkage(w,b,lambda1,beta):
 
     return signed_obj[0]
 
-def split_bregman(cov,mean,lambda1,lambda2,lb,ub,beta=None,tol=1e-10,maxiter=100,approach=2,verbose=True):
+def split_bregman(cov,mean,lambda1,lambda2,lb,ub,beta=None,tol=1e-5,maxiter=100,approach=2,verbose=True):
     """ Split Bregman Optimization Routine
     """
 
@@ -117,5 +117,8 @@ def split_bregman(cov,mean,lambda1,lambda2,lb,ub,beta=None,tol=1e-10,maxiter=100
         if verbose:
             print(f"Total Cost: {total_cost}")
         
-        w_old=w
+        # additional normalization
+        if abs(1-np.sum(abs(w)))>tol:
+            w=w/np.sum(abs(w))
+            
     return w, total_cost,status
