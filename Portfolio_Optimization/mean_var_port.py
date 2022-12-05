@@ -20,9 +20,9 @@ def MeanVarPort(bnds, matrix,num_port=10,verbose=True):
         xOptimal.append(result)
         expPortfolioReturnPoint.append(lower)
         if verbose:
-            print("For expected portfolio return of ", lower)
-            print("Portfolio Risk: ", np.sqrt(np.dot(np.dot(result, covMatrix), result)))
-            print("Portfolio Return: ", np.dot(result, meanVector))
+            print("For expected portfolio return of ",np.round( lower,2))
+            print("Portfolio Risk: ",np.round( np.sqrt(np.dot(np.dot(result, covMatrix), result)),2))
+            print("Portfolio Return: ", np.round(np.dot(result, meanVector),2))
             print("")
         lower = lower + increment
    
