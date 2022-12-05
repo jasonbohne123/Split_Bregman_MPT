@@ -1,4 +1,4 @@
-### Penalized Mean-Variance Portfolio Optimization using Weighted Elastic Net
+### Mean-Variance Portfolio Optimization using  Elastic Net Penalty
 
 **Data Preprocessing and Feature Generation**
 - U.S. Equity data for underlyings in S&P500 between 2010 and 2021
