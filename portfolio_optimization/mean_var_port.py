@@ -1,15 +1,12 @@
 import numpy as np
-
-
 from portfolio_optimization.max_var_port import MaxRetPort
 from portfolio_optimization.min_var_port import MinVarPort
 
-def MeanVarPort(bnds, matrix):
+def MeanVarPort(bnds, matrix,num_port=10,verbose=True):
     """ Compute the mean variance portfolio for fixed mean which is a quadratic program"""
 
-    increment = 0.0001
-    lower = bnds[0]
-    upper = bnds[1]
+    lower,upper=bnds
+    increment=(upper-lower)/num_port
 
     meanVector = matrix.mean()
     covMatrix = matrix.cov()
@@ -20,9 +17,13 @@ def MeanVarPort(bnds, matrix):
 
     while (lower < upper):
 
-        result3 = MinVarPort(covMatrix, meanVector, lower, False)
-        xOptimal.append(result3.x)
+        result = MinVarPort(covMatrix, meanVector, lower, False)
+        xOptimal.append(result)
         expPortfolioReturnPoint.append(lower)
+        if verbose:
+            print("Portfolio Risk: ", np.sqrt(np.dot(np.dot(result, covMatrix), result)))
+            print("Portfolio Return: ", np.dot(result, meanVector))
+            print("")
         lower = lower + increment
    
     xOptimalArray = np.array(xOptimal)
