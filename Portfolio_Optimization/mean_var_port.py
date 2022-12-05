@@ -1,6 +1,5 @@
 import numpy as np
-from portfolio_optimization.max_var_port import MaxRetPort
-from portfolio_optimization.min_var_port import MinVarPort
+from Portfolio_Optimization.min_var_port import MinVarPort
 
 def MeanVarPort(bnds, matrix,num_port=10,verbose=True):
     """ Compute the mean variance portfolio for fixed mean which is a quadratic program"""
