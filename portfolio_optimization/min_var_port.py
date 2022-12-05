@@ -33,12 +33,12 @@ def MinVarPort(cov, meanVector = None, fixed_return = None, flag = True):
     if (flag == True):
         cons = ({'type': 'eq', 'fun' : wConstraint})
         opt = optimize.minimize (f, x0 = weights, args = (cov),  
-                                 bounds = bnds, constraints = cons, tol = 10**-6)
+                                 bounds = bnds, constraints = cons, tol = 10**-3,options={'maxiter':100})
     
     # for a fixed porfolio return 
     else:
         cons = ({'type': 'eq', 'fun': wConstraint}, {'type': 'ineq', 'fun': fix_return_Constraint, 'args': (meanVector, fixed_return)})
         opt = optimize.minimize (f, args = (cov), method ='trust-constr', 
-                                 x0 = weights, bounds = bnds, constraints = cons, tol = 10**-6)
+                                 x0 = weights, bounds = bnds, constraints = cons, tol = 10**-3,options={'maxiter':100})
     
     return opt.x

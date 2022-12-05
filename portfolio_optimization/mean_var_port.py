@@ -21,6 +21,7 @@ def MeanVarPort(bnds, matrix,num_port=10,verbose=True):
         xOptimal.append(result)
         expPortfolioReturnPoint.append(lower)
         if verbose:
+            print("For expected portfolio return of ", lower)
             print("Portfolio Risk: ", np.sqrt(np.dot(np.dot(result, covMatrix), result)))
             print("Portfolio Return: ", np.dot(result, meanVector))
             print("")
@@ -38,4 +39,7 @@ def optimzie_sharpe(stds,means):
     
     sharpe = means/stds
     max_sharpe_idx = sharpe.idxmax()
-    return max_sharpe_idx
+
+    optimal_mean=means[max_sharpe_idx]
+    optimal_std=stds[max_sharpe_idx]
+    return optimal_mean,optimal_std
