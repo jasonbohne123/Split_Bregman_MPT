@@ -29,16 +29,16 @@ def MeanVarPort(bnds, matrix,num_port=10,verbose=True):
    
     xOptimalArray = np.array(xOptimal)
     minRiskPoint = np.diagonal(np.matmul((np.matmul(xOptimalArray, covMatrix)), np.transpose(xOptimalArray)))
-    riskPoint =   np.sqrt(minRiskPoint*251) 
-    retPoint = 251*np.array(expPortfolioReturnPoint) 
+    riskPoint =   np.sqrt(minRiskPoint) 
+    retPoint = np.array(expPortfolioReturnPoint) 
     
     return riskPoint, retPoint
 
-def optimzie_sharpe(stds,means):
+def optimize_sharpe(stds,means):
     """ Compute the optimal portfolio for the sharpe ratio given efficient frontier"""
     
     sharpe = means/stds
-    max_sharpe_idx = sharpe.idxmax()
+    max_sharpe_idx = np.argmax(sharpe)
 
     optimal_mean=means[max_sharpe_idx]
     optimal_std=stds[max_sharpe_idx]

@@ -2,7 +2,7 @@ import numpy as np
 from scipy import optimize
 
 
-def MinVarPort(cov, meanVector = None, fixed_return = None, flag = True):
+def MinVarPort(cov, meanVector = None, fixed_return = None, flag = True,max_pos=0.33):
     """ Compute the minimum variance portfolio which is a quadratic problem 
     """
     
@@ -27,7 +27,7 @@ def MinVarPort(cov, meanVector = None, fixed_return = None, flag = True):
     weights = np.repeat(1, len(cov))
     
     # Assume we don't want a single position larger than 33%
-    bnds = tuple([(0, 0.33) for _ in weights])
+    bnds = tuple([(0, max_pos) for _ in weights])
     
     # if we want to compute min var
     if (flag == True):

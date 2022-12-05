@@ -1,10 +1,10 @@
 import numpy as np
-from scipy.optimize import Bounds, LinearConstraint, minimize
+from scipy.optimize import Bounds, minimize
 from scipy.sparse import csc_matrix
 from qpsolvers import solve_qp
 
 
-def qp(cov,mean,w,d,b,lb,ub,lambda2,approach,tol=10e-6,maxiter=25,verbose=True):
+def qp(cov,mean,w,d,b,lb,ub,lambda2,fixed_return,approach,tol=10e-6,maxiter=25,verbose=True):
     """ Inner optimization problem using unconstrained optimization 
         Approach "numerical" solves numerically via unconstrained minimization
         Approach "closed-form" solves analytically via cvxopt within qpsolvers 
@@ -18,17 +18,30 @@ def qp(cov,mean,w,d,b,lb,ub,lambda2,approach,tol=10e-6,maxiter=25,verbose=True):
     if approach=="numerical":
         
         # define objective function
-        def objective_val(w,cov,mean,d,b,lambda2):
-            obj=np.dot(np.dot(w,cov+lambda2*np.diag(d-b)),w)-np.dot(w,mean)
+        def objective_val(w,cov,d,b,lambda2):
+            obj=np.dot(np.dot(w,cov+lambda2*np.diag(d-b)),w)
             return obj
         
         # define bounds and constraints
         bounds=Bounds(lb,ub)
-        lc=LinearConstraint(np.ones(len(mean)),1,1)
+           
+        # unit norm weight constraint and fixed mean inequality constraint
+        def wConstraint(weights):
+            A = np.ones(len(weights))
+            b = 1
+            val = np.dot(weights, A) - b        
+            return val
 
+        def fix_return_Constraint(weights, meanVector, fixed_return):
+            A = np.array(meanVector)
+            b = fixed_return
+            val = np.dot(weights, A) - b
+            return val
+
+        cons = ({'type': 'eq', 'fun': wConstraint}, {'type': 'ineq', 'fun': fix_return_Constraint, 'args': (mean, fixed_return)})
         # solve unconstrained optimization problem
         try:
-            res=minimize(objective_val,x0=x0,args=(cov,mean,d,b,lambda2),method='SLSQP',bounds=bounds,constraints=lc,options={'maxiter':maxiter},tol=tol)
+            res=minimize(objective_val,x0=x0,args=(cov,d,b,lambda2),method='SLSQP',bounds=bounds,constraints=cons,options={'maxiter':maxiter},tol=tol)
         except Exception as e:
             print(e)
             status="failed"
@@ -42,11 +55,14 @@ def qp(cov,mean,w,d,b,lb,ub,lambda2,approach,tol=10e-6,maxiter=25,verbose=True):
         w_old=w
         # define objective function
         quad=csc_matrix((cov+lambda2*np.diag(d-b)),shape=(len(mean),len(mean)))
-        linear=-1*mean
         
         # constrain solution vector to be unit norm and non-negative
         A=np.ones(len(mean))
         constraint=np.array([1.0])
+
+        # inequality constraint for fixed return
+        G=mean
+        h=np.array([fixed_return])
 
         # set box constraints
         lb_vec=lb*np.ones(len(mean))
@@ -54,7 +70,7 @@ def qp(cov,mean,w,d,b,lb,ub,lambda2,approach,tol=10e-6,maxiter=25,verbose=True):
 
         #solve qp problem
         try:
-            w = solve_qp(quad,linear,A=A,b=constraint,lb=lb_vec,ub=ub_vec,initvals=x0, solver="cvxopt")
+            w = solve_qp(quad,q=np.zeros(len(mean)),G=G,h=h,A=A,b=constraint, lb=lb_vec,ub=ub_vec,initvals=x0, solver="cvxopt")
         except Exception as e:
             print(e)
             status="failed"
@@ -79,7 +95,7 @@ def shrinkage(w,b,lambda1,beta):
 
     return signed_obj[0]
 
-def split_bregman(cov,mean,lambda1,lambda2,lb,ub,beta=None,tol=1e-5,maxiter=100,approach=2,verbose=True):
+def split_bregman(cov,mean,lambda1,lambda2,fixed_return,lb,ub,beta=None,tol=1e-5,maxiter=100,approach='closed-form',verbose=True):
     """ Split Bregman Optimization Routine
     """
 
@@ -101,7 +117,7 @@ def split_bregman(cov,mean,lambda1,lambda2,lb,ub,beta=None,tol=1e-5,maxiter=100,
             break
         
         # solve qp problem either closed form or numerically
-        w,status=qp(cov,mean,w,d,b,lb,ub,lambda2,approach,tol,maxiter,verbose)
+        w,status=qp(cov,mean,w,d,b,lb,ub,lambda2,fixed_return,approach,tol,maxiter,verbose)
         
         if status=="failed":
             break
