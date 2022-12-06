@@ -18,7 +18,7 @@
 - Iteratively solves constrained QP and LP either in closed-form or numerically
 - Performs a grid search for optimal calibration of regularization parameters 
 
-**Out of Sample Numerical Results**
+**Numerical Results**
 
 Approaches:
 - Minimum Variance Objective
